@@ -1,0 +1,10 @@
+feign:
+  client:
+    config:
+      default:
+        readTimeout: 1500
+        connectTimeout: 500
+Vk:
+  url: https://api.vk.com/method
+  version: 5.131
+  name: Vk
