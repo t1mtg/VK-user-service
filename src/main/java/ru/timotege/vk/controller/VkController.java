@@ -1,7 +1,13 @@
 package ru.timotege.vk.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +20,7 @@ import ru.timotege.vk.service.VkService;
 import javax.validation.Valid;
 import java.util.Objects;
 
-@RequestMapping("/vk")
+@RequestMapping(path = "/vk", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class VkController {
 
@@ -24,10 +30,21 @@ public class VkController {
         this.vkService = vkService;
     }
 
-    @GetMapping("/get-info")
+    @Operation(summary = "Get name, surname and whether user belongs to the group",
+            security = @SecurityRequirement(name = "basicAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User's name, middle name, surname and group member status",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ResponseDTO.class))}),
+            @ApiResponse(responseCode = "400", description = "Provided data is not correct.",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE)}),
+            @ApiResponse(responseCode = "404", description = "User with provided id not found.",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE)})
+    })
+    @PostMapping("/get-info")
     public ResponseDTO getUser(@RequestHeader("vk_service_token") String access_token,
-                               @Valid @RequestBody RequestDTO requestDTO
-    ) throws JsonProcessingException {
+                               @Valid @RequestBody() RequestDTO requestDTO
+    ) {
         return vkService.getUsersData(access_token, requestDTO);
     }
 
@@ -35,7 +52,7 @@ public class VkController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleException(VkUserNotFoundException e) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.NOT_FOUND)
                 .body(e.getMessage());
     }
 
@@ -55,4 +72,5 @@ public class VkController {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(message);
     }
+
 }
