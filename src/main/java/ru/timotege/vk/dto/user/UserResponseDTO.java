@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class UserResponseDTO {
 
-    Long id;
+    public final Long id;
 
-    String username;
+    public final String username;
 }

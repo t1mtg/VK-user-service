@@ -41,11 +41,11 @@ public class VkController {
             @ApiResponse(responseCode = "404", description = "User with provided id not found.",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE)})
     })
-    @PostMapping("/get-info")
-    public ResponseDTO getUser(@RequestHeader("vk_service_token") String access_token,
+    @PostMapping("/is-member")
+    public ResponseDTO getUser(@RequestHeader("vk_service_token") String accessToken,
                                @Valid @RequestBody() RequestDTO requestDTO
     ) {
-        return vkService.getUsersData(access_token, requestDTO);
+        return vkService.getUsersData(accessToken, requestDTO);
     }
 
     @ExceptionHandler(VkUserNotFoundException.class)
