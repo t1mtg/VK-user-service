@@ -1,4 +1,4 @@
-package ru.timotege.vk.dto;
+package ru.timotege.vk.dto.vk;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
