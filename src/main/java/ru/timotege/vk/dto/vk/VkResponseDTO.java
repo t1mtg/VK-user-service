@@ -1,4 +1,4 @@
-package ru.timotege.vk.dto;
+package ru.timotege.vk.dto.vk;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
