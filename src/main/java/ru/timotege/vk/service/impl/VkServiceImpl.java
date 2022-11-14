@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ru.timotege.vk.api.VkApi;
 import ru.timotege.vk.dto.vk.RequestDTO;
@@ -27,6 +28,7 @@ public class VkServiceImpl implements VkService {
     }
 
     @Override
+    @Cacheable("userCache")
     public ResponseDTO getUsersData(String accessToken, RequestDTO data) {
         var user = getUser(accessToken, data);
 
