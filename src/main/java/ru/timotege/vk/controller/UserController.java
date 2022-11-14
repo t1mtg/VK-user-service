@@ -1,6 +1,15 @@
 package ru.timotege.vk.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,9 +21,17 @@ import ru.timotege.vk.service.impl.UserDetailsServiceImpl;
 import javax.validation.Valid;
 import java.util.Objects;
 
-@RequestMapping("/users")
+@RequestMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 @Validated
+
+@Configuration
+@SecurityScheme(
+        name = "basicAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "basic"
+)
+
 public class UserController {
 
     private final UserDetailsServiceImpl userService;
@@ -23,6 +40,14 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Sign up in service(create new user)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User was successfully created.",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = UserResponseDTO.class))}),
+            @ApiResponse(responseCode = "400", description = "Some credentials are incorrect.",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE)})
+    })
     @PostMapping("/signup")
     public UserResponseDTO getUser(@Valid @RequestBody UserRequestDTO requestDTO) {
         return userService.saveUser(requestDTO);
