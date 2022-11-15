@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.timotege.vk.dto.user.UserRequestDTO;
 import ru.timotege.vk.dto.user.UserResponseDTO;
@@ -16,9 +16,11 @@ import ru.timotege.vk.repository.UserRepository;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserDetailsServiceImpl(UserRepository userRepository) {
+    public UserDetailsServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -31,13 +33,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public UserResponseDTO saveUser(UserRequestDTO requestDTO) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
-        var password = passwordEncoder.encode(requestDTO.getPassword());
+        var encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
 
-        User user = new User(requestDTO.getUsername(), password);
+        User user = new User(requestDTO.getUsername(), encodedPassword);
         var savedUser = userRepository.save(user);
 
         return new UserResponseDTO(savedUser.getId(), savedUser.getUsername());
     }
-
 }
