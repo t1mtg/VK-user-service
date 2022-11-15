@@ -1,6 +1,7 @@
 package ru.timotege.vk.service.impl;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,6 +14,7 @@ import ru.timotege.vk.repository.UserRepository;
 
 @Service("userDetailsServiceImpl")
 @Getter
+@Slf4j
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -38,6 +40,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = new User(requestDTO.getUsername(), encodedPassword);
         var savedUser = userRepository.save(user);
 
+        log.info("User successfully saved, username: " + savedUser.getUsername());
         return new UserResponseDTO(savedUser.getId(), savedUser.getUsername());
     }
 }
