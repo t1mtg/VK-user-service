@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,8 @@ import javax.validation.Valid;
 import java.util.Objects;
 
 @RequestMapping(path = "/vk", produces = MediaType.APPLICATION_JSON_VALUE)
-@RestController
+@RestController("controller")
+@Qualifier
 public class VkController {
 
     private final VkService vkService;
@@ -46,6 +48,11 @@ public class VkController {
                                @Valid @RequestBody() RequestDTO requestDTO
     ) {
         return vkService.getUsersData(accessToken, requestDTO);
+    }
+
+    @GetMapping("/greet")
+    public String getGreet() {
+        return "Hello!";
     }
 
     @ExceptionHandler(VkUserNotFoundException.class)

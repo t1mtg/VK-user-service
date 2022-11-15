@@ -7,12 +7,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "users")
 @RequiredArgsConstructor
 @NoArgsConstructor
+@Data
 public class User implements UserDetails {
 
     @Id
