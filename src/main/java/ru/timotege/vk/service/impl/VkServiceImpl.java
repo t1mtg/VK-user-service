@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ru.timotege.vk.api.VkApi;
-import ru.timotege.vk.dto.vk.RequestDTO;
-import ru.timotege.vk.dto.vk.ResponseDTO;
-import ru.timotege.vk.dto.vk.VkGetUserResponseDTO;
-import ru.timotege.vk.dto.vk.VkIsMemberResponseDTO;
+import ru.timotege.vk.dto.vk.*;
 import ru.timotege.vk.exception.VkException;
 import ru.timotege.vk.exception.VkUserNotFoundException;
 import ru.timotege.vk.service.VkService;
@@ -18,6 +15,9 @@ import ru.timotege.vk.service.VkService;
 @Service
 public class VkServiceImpl implements VkService {
 
+    public static final String ERROR = "error";
+    public static final String ERROR_MSG = "error_msg";
+    public static final String NICKNAME = "nickname";
     private final VkApi vkApi;
 
     @Value("${Vk.version}")
@@ -30,42 +30,37 @@ public class VkServiceImpl implements VkService {
     @Override
     @Cacheable("userCache")
     public ResponseDTO getUsersData(String accessToken, RequestDTO data) {
-        var user = getUser(accessToken, data);
+        VkResponseDTO user = getUser(accessToken, data);
 
         //Here we use id from received user because ID provided in user's query could be String not Integer.
-        boolean isMember = isMember(accessToken, user.getResponse()[0].getId(), data.groupId);
+        boolean isMember = isMember(accessToken, user.getId(), data.groupId);
 
         return new ResponseDTO(
-                user.getResponse()[0].getLastName(),
-                user.getResponse()[0].getFirstName(),
-                user.getResponse()[0].getMiddleName(),
+                user.getLastName(),
+                user.getFirstName(),
+                user.getMiddleName(),
                 isMember
         );
     }
 
     private static void catchVkError(ObjectMapper mapper, String vkResponse) {
         try {
-            JsonNode jsonErrorResponse = mapper.readTree(vkResponse).get("error");
+            JsonNode jsonErrorResponse = mapper.readTree(vkResponse).get(ERROR);
             if (jsonErrorResponse != null) {
-                var message = jsonErrorResponse.get("error_msg");
+                var message = jsonErrorResponse.get(ERROR_MSG);
                 throw new VkException(String.valueOf(message));
             }
+
         } catch (JsonProcessingException e) {
             throw new VkException(e.getMessage());
         }
 
     }
 
-    private static void validateId(VkGetUserResponseDTO response) {
-        if (response.getResponse().length == 0) {
-            throw new VkUserNotFoundException();
-        }
-    }
-
-    private VkGetUserResponseDTO getUser(String accessToken, RequestDTO data) {
+    private VkResponseDTO getUser(String accessToken, RequestDTO data) {
         ObjectMapper mapper = new ObjectMapper();
 
-        String vkResponse = vkApi.getUserData(accessToken, data.getUserId(), "nickname", version);
+        String vkResponse = vkApi.getUserData(accessToken, data.getUserId(), NICKNAME, version);
 
         catchVkError(mapper, vkResponse);
 
@@ -75,9 +70,12 @@ public class VkServiceImpl implements VkService {
         } catch (JsonProcessingException e) {
             throw new VkException(e.getMessage());
         }
-        validateId(user);
 
-        return user;
+        if (user.getResponse().length == 0) {
+            throw new VkUserNotFoundException();
+        }
+
+        return user.getResponse()[0];
     }
 
     private boolean isMember(String accessToken, int userId, String groupId) {

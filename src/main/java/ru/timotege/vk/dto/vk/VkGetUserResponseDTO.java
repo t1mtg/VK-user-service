@@ -11,5 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class VkGetUserResponseDTO {
 
-    VkResponseDTO[] response;
+    public VkResponseDTO[] response;
 }

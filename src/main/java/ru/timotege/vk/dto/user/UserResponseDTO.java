@@ -1,15 +1,11 @@
 package ru.timotege.vk.dto.user;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
 public class UserResponseDTO {
 
-    Long id;
+    public final Long id;
 
-    String username;
+    public final String username;
 }
