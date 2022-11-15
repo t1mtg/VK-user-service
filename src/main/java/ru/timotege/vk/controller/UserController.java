@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,6 +25,7 @@ import java.util.Objects;
 @RequestMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 @Validated
+@Slf4j
 
 @Configuration
 @SecurityScheme(
@@ -50,6 +52,7 @@ public class UserController {
     })
     @PostMapping("/signup")
     public UserResponseDTO getUser(@Valid @RequestBody UserRequestDTO requestDTO) {
+        log.info("Saving user, username: " + requestDTO.getUsername());
         return userService.saveUser(requestDTO);
     }
 

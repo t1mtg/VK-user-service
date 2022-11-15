@@ -3,6 +3,7 @@ package ru.timotege.vk.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import ru.timotege.vk.exception.VkUserNotFoundException;
 import ru.timotege.vk.service.VkService;
 
 @Service
+@Slf4j
 public class VkServiceImpl implements VkService {
 
     public static final String ERROR = "error";
@@ -48,10 +50,13 @@ public class VkServiceImpl implements VkService {
             JsonNode jsonErrorResponse = mapper.readTree(vkResponse).get(ERROR);
             if (jsonErrorResponse != null) {
                 var message = jsonErrorResponse.get(ERROR_MSG);
+                log.error(String.valueOf(message));
                 throw new VkException(String.valueOf(message));
             }
 
         } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+
             throw new VkException(e.getMessage());
         }
 
@@ -61,20 +66,23 @@ public class VkServiceImpl implements VkService {
         ObjectMapper mapper = new ObjectMapper();
 
         String vkResponse = vkApi.getUserData(accessToken, data.getUserId(), NICKNAME, version);
-
         catchVkError(mapper, vkResponse);
 
         VkGetUserResponseDTO user;
         try {
             user = mapper.readValue(vkResponse, VkGetUserResponseDTO.class);
         } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
             throw new VkException(e.getMessage());
         }
 
+
         if (user.getResponse().length == 0) {
+            log.error("User not found");
             throw new VkUserNotFoundException();
         }
 
+        log.info("Got user's name");
         return user.getResponse()[0];
     }
 
@@ -88,9 +96,11 @@ public class VkServiceImpl implements VkService {
         try {
             apiIsMemberResponse = mapper.readValue(vkResponse, VkIsMemberResponseDTO.class);
         } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
             throw new VkException(e.getMessage());
         }
 
+        log.info("Got user's isMember flag");
         return apiIsMemberResponse.getResponse() == 1;
     }
 }

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,6 +25,7 @@ import java.util.Objects;
 @RequestMapping(path = "/vk", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController("controller")
 @Qualifier
+@Slf4j
 public class VkController {
 
     private final VkService vkService;
@@ -47,6 +49,7 @@ public class VkController {
     public ResponseDTO getUser(@RequestHeader("vk_service_token") String accessToken,
                                @Valid @RequestBody() RequestDTO requestDTO
     ) {
+        log.info("Getting information about user, id = {}", requestDTO.getUserId());
         return vkService.getUsersData(accessToken, requestDTO);
     }
 
