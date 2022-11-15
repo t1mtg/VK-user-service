@@ -53,11 +53,6 @@ public class VkController {
         return vkService.getUsersData(accessToken, requestDTO);
     }
 
-    @GetMapping("/greet")
-    public String getGreet() {
-        return "Hello!";
-    }
-
     @ExceptionHandler(VkUserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleException(VkUserNotFoundException e) {
